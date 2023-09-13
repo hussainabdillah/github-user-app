@@ -11,7 +11,7 @@
     android:layout_marginTop="4dp"
     android:layout_marginEnd="8dp"
     android:layout_marginBottom="4dp"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -20,8 +20,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="60dp"
@@ -40,29 +40,33 @@
 
         <TextView
             android:id="@+id/tv_item_username"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="hussainabdillah"
             android:textSize="20sp"
             android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/cardView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
             app:layout_constraintTop_toTopOf="@+id/cardView"
-            app:layout_constraintStart_toEndOf="@+id/cardView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/cardView"
-            android:text="hussainabdillah"
-            android:paddingLeft="30dp"
-            />
+            app:layout_constraintVertical_bias="0.0" />
+
         <TextView
-            android:id="@+id/tv_item_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
+            android:id="@+id/tv_item_url"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:text="https://github.com/hussainabdillah"
+            android:textSize="10sp"
             android:textStyle="normal"
-            app:layout_constraintTop_toBottomOf="@+id/tv_item_username"
-            app:layout_constraintStart_toEndOf="@+id/cardView"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="@+id/cardView"
-            android:text="Hussain Abdillah Tugas Kelarno"
-            android:paddingLeft="30dp"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toBottomOf="@+id/tv_item_username"
+            app:layout_constraintVertical_bias="1.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
