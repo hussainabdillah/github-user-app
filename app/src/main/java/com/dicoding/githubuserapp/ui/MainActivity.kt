@@ -3,6 +3,7 @@ package com.dicoding.githubuserapp.ui
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +29,18 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        with(binding) {
+            searchView.setupWithSearchBar(searchBar)
+            searchView
+                .editText
+                .setOnEditorActionListener { textView, actionId, event ->
+                    searchBar.text = searchView.text
+                    searchView.hide()
+                    Toast.makeText(this@MainActivity, searchView.text, Toast.LENGTH_SHORT).show()
+                    false
+                }
+        }
 
         val layoutManager = LinearLayoutManager(this)
         binding.rvGithubuser.layoutManager = layoutManager
