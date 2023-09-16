@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                 .setOnEditorActionListener { textView, actionId, event ->
                     searchBar.text = searchView.text
                     searchView.hide()
-                    Toast.makeText(this@MainActivity, searchView.text, Toast.LENGTH_SHORT).show()
+                    fetchGithubUsers(searchView.text.toString())
                     false
                 }
         }
@@ -50,14 +50,14 @@ class MainActivity : AppCompatActivity() {
         adapter = GithubUserAdapter()
         binding.rvGithubuser.adapter = adapter
 
-        // Panggil fungsi untuk mengambil data dari API
-        fetchGithubUsers()
+
+        fetchGithubUsers("Arif")
     }
 
-    private fun fetchGithubUsers() {
+    private fun fetchGithubUsers(query: String) {
         showLoading(true)
         val apiService = ApiConfig.getApiService()
-        val call = apiService.getListUsers("Arif") // Ganti dengan query yang sesuai
+        val call = apiService.getListUsers(query)
 
         call.enqueue(object : Callback<GithubResponse> {
             override fun onResponse(call: Call<GithubResponse>, response: Response<GithubResponse>) {
