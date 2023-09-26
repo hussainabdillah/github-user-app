@@ -2,7 +2,6 @@ package com.dicoding.githubuserapp.data.response
 
 import com.google.gson.annotations.SerializedName
 
-
 data class GithubResponse(
 
 	@field:SerializedName("total_count")

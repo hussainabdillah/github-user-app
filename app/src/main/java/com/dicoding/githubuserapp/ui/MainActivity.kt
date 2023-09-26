@@ -1,15 +1,15 @@
 package com.dicoding.githubuserapp.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.dicoding.githubuserapp.data.retrofit.ApiConfig
 import com.dicoding.githubuserapp.data.response.GithubResponse
+import com.dicoding.githubuserapp.data.response.ItemsItem
+import com.dicoding.githubuserapp.data.retrofit.ApiConfig
 import com.dicoding.githubuserapp.databinding.ActivityMainBinding
 import retrofit2.Call
 import retrofit2.Callback
@@ -18,46 +18,66 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: GithubUserAdapter
+    private lateinit var adapter: UserAdapter
+    private lateinit var viewModel: MainViewModel
 
     companion object {
         private const val TAG = "MainActivity"
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
         with(binding) {
             searchView.setupWithSearchBar(searchBar)
             searchView
                 .editText
-                .setOnEditorActionListener { textView, actionId, event ->
-                    searchBar.text = searchView.text
+                .setOnEditorActionListener { _, _, _ ->
+                    val querySearch = searchView.text.toString()
+                    viewModel.setSearchUsers(querySearch)
                     searchView.hide()
-                    fetchGithubUsers(searchView.text.toString())
-                    false
+                    true
                 }
         }
 
         val layoutManager = LinearLayoutManager(this)
         binding.rvGithubuser.layoutManager = layoutManager
-        val itemDecoration = DividerItemDecoration(this, layoutManager.orientation)
-        binding.rvGithubuser.addItemDecoration(itemDecoration)
 
-        adapter = GithubUserAdapter()
+        adapter = UserAdapter()
         binding.rvGithubuser.adapter = adapter
 
-
-        fetchGithubUsers("Arif")
+        adapter.setOnItemClickListener(object : UserAdapter.OnItemClickListener {
+            override fun onItemClick(user: ItemsItem) {
+                val intent = Intent(this@MainActivity, DetailActivity::class.java)
+                intent.putExtra("username", user.login)
+                startActivity(intent)
+            }
+        })
+        viewModel.getSearchUsers().observe(this) { githubUsers ->
+            adapter.submitList(githubUsers)
+        }
+        viewModel.isLoading.observe(this) { isLoading ->
+            showLoading(isLoading)
+        }
+        showUserGitHub()
     }
 
-    private fun fetchGithubUsers(query: String) {
+    private fun showLoading(isLoading: Boolean) {
+        if (isLoading) {
+            binding.progressBar.visibility = View.VISIBLE
+        } else {
+            binding.progressBar.visibility = View.GONE
+        }
+    }
+
+    private fun showUserGitHub() {
         showLoading(true)
         val apiService = ApiConfig.getApiService()
-        val call = apiService.getListUsers(query)
+        val call = apiService.getListUsers("Arif")
 
         call.enqueue(object : Callback<GithubResponse> {
             override fun onResponse(call: Call<GithubResponse>, response: Response<GithubResponse>) {
@@ -76,12 +96,5 @@ class MainActivity : AppCompatActivity() {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
         })
-    }
-    private fun showLoading(isLoading: Boolean) {
-        if (isLoading) {
-            binding.progressBar.visibility = View.VISIBLE
-        } else {
-            binding.progressBar.visibility = View.GONE
-        }
     }
 }
