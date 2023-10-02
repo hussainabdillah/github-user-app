@@ -13,4 +13,3 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/src/main/java/com/dicoding/githubuserapp/data/retrofit/ApiConfig.kt

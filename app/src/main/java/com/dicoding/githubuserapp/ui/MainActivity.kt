@@ -3,14 +3,18 @@ package com.dicoding.githubuserapp.ui
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dicoding.githubuserapp.R
 import com.dicoding.githubuserapp.data.response.GithubResponse
 import com.dicoding.githubuserapp.data.response.ItemsItem
 import com.dicoding.githubuserapp.data.retrofit.ApiConfig
 import com.dicoding.githubuserapp.databinding.ActivityMainBinding
+import com.dicoding.githubuserapp.ui.favorites.FavoriteUserActivity
+import com.dicoding.githubuserapp.ui.settings.ThemeSettingsActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,8 +28,11 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -42,7 +49,25 @@ class MainActivity : AppCompatActivity() {
                     searchView.hide()
                     true
                 }
+            searchBar.inflateMenu(R.menu.main_menu)
+            searchBar.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.theme_setting -> {
+                        // Handle klik pada menu theme_setting di sini
+                        val intent = Intent(this@MainActivity, ThemeSettingsActivity::class.java)
+                        startActivity(intent)
+                        true
+                    }
+                    R.id.favorites_list -> {
+                        val intent = Intent(this@MainActivity, FavoriteUserActivity::class.java)
+                        startActivity(intent)
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
+
 
         val layoutManager = LinearLayoutManager(this)
         binding.rvGithubuser.layoutManager = layoutManager
@@ -65,6 +90,18 @@ class MainActivity : AppCompatActivity() {
         }
         showUserGitHub()
     }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.theme_setting -> {
+                // Handle klik pada menu theme_setting di sini
+                val intent = Intent(this, ThemeSettingsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
 
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {

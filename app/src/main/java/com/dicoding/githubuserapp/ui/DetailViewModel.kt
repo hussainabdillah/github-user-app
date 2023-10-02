@@ -1,5 +1,6 @@
 package com.dicoding.githubuserapp.ui
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,11 +8,13 @@ import androidx.lifecycle.ViewModel
 import com.dicoding.githubuserapp.data.response.DetailUserResponse
 import com.dicoding.githubuserapp.data.response.ItemsItem
 import com.dicoding.githubuserapp.data.retrofit.ApiConfig
+import com.dicoding.githubuserapp.database.FavoriteUser
+import com.dicoding.githubuserapp.repository.FavoriteUserRepository
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel(application: Application) : ViewModel() {
 
     private val _userDetail = MutableLiveData<DetailUserResponse>()
     val userDetail: LiveData<DetailUserResponse> = _userDetail
@@ -27,6 +30,7 @@ class DetailViewModel : ViewModel() {
     private val _following = MutableLiveData<List<ItemsItem>>()
     val following: LiveData<List<ItemsItem>> = _following
 
+    private val mFavoriteUserRepository: FavoriteUserRepository = FavoriteUserRepository(application)
     fun setUserDetail(username: String) {
         showLoading(true)
         ApiConfig.getApiService()
@@ -93,4 +97,18 @@ class DetailViewModel : ViewModel() {
                 }
             })
     }
+
+    fun insert(favoriteUser: FavoriteUser) {
+        mFavoriteUserRepository.insert(favoriteUser)
+    }
+
+    fun delete(favoriteUser: FavoriteUser) {
+        mFavoriteUserRepository.delete(favoriteUser)
+    }
+
+    fun update(favoriteUser: FavoriteUser) {
+        mFavoriteUserRepository.update(favoriteUser)
+    }
+
+    fun getAllFavoriteUser(): LiveData<List<FavoriteUser>> = mFavoriteUserRepository.getAllFavoriteUser()
 }

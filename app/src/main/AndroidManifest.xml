@@ -25,6 +25,14 @@
             android:name=".ui.DetailActivity"
             android:label="Detail Activity">
         </activity>
+        <activity
+            android:name=".ui.settings.ThemeSettingsActivity"
+            android:label="Theme Settings Activity">
+        </activity>
+        <activity
+            android:name=".ui.favorites.FavoriteUserActivity"
+            android:label="Favorite User Activity">
+        </activity>
     </application>
 
 </manifest>
