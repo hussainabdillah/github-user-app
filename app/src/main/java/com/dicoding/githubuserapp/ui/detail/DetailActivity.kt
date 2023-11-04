@@ -1,13 +1,13 @@
-package com.dicoding.githubuserapp.ui
+package com.dicoding.githubuserapp.ui.detail
 
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -16,10 +16,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.dicoding.githubuserapp.R
-import com.dicoding.githubuserapp.data.response.DetailUserResponse
 import com.dicoding.githubuserapp.database.FavoriteUser
 import com.dicoding.githubuserapp.databinding.ActivityDetailBinding
-import com.dicoding.githubuserapp.ui.favorites.FavoriteUserViewModel
+import com.dicoding.githubuserapp.ui.ViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -35,18 +34,37 @@ class DetailActivity : AppCompatActivity() {
     private lateinit var tvFollowing: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var favButton: FloatingActionButton
-    private var buttonState: Boolean = false
-    private var favoriteUser: FavoriteUser? = null
-    private var detailUser = DetailUserResponse()
+    private var isFavorited = false
 
     companion object {
         var ARG_USERNAME = "username"
+
         @StringRes
         private val TAB_TITLES = intArrayOf(
             R.string.tab_text_1,
             R.string.tab_text_2
         )
     }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.detail_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_share -> {
+                val htmlUrl = intent.getStringExtra("htmlUrl")
+                val shareIntent = Intent(Intent.ACTION_SEND)
+                shareIntent.type = "text/plain"
+                val shareText = "Check this awesome GitHub profile: $htmlUrl "
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareText)
+                startActivity(Intent.createChooser(shareIntent, "Share via"))
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +72,10 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = obtainViewModel(this@DetailActivity)
+        setSupportActionBar(binding.myToolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        getSupportActionBar()?.setTitle("User Detail");
+
 
         ivProfileDetail = binding.ivProfileDetail
         tvUsername = binding.tvUsername
@@ -64,8 +85,6 @@ class DetailActivity : AppCompatActivity() {
         progressBar = binding.progressBar
         favButton = binding.fab
 
-        favoriteUser = FavoriteUser()
-        detailUser = DetailUserResponse()
 
         val username = intent.getStringExtra(ARG_USERNAME)
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
@@ -77,7 +96,7 @@ class DetailActivity : AppCompatActivity() {
             tab.text = resources.getString(TAB_TITLES[position])
         }.attach()
 
-        viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
+        viewModel = obtainViewModel(this@DetailActivity)
         viewModel.userDetail.observe(this) { userDetail ->
             if (userDetail != null) {
                 tvUsername.text = userDetail.login
@@ -97,39 +116,57 @@ class DetailActivity : AppCompatActivity() {
         showLoading(true)
         viewModel.setUserDetail(username ?: "")
 
-        viewModel.userDetail.observe(this, { })
-
-        favButton.setOnClickListener{
-            if (!buttonState) {
-                buttonState = true
-                favButton.setImageResource(R.drawable.ic_favorite_fill)
-                insertToDatabase(detailUser)
-            } else {
-                buttonState = false
-                favButton.setImageResource(R.drawable.ic_favorite)
-
+        viewModel.userDetail.observe(this) { userDetail ->
+            userDetail?.let {
+                val login = userDetail.login ?: "hussainabdillah"
+                val avatarUrl = userDetail.avatarUrl ?: "https://avatars.githubusercontent.com/u/95351829?v=4"
+                val htmlUrl = userDetail.htmlUrl ?: "https://github.com/hussainabdillah"
+                insertFavoriteUser(login, avatarUrl, htmlUrl)
             }
         }
+
     }
 
     private fun obtainViewModel(activity: AppCompatActivity): DetailViewModel {
         val factory = ViewModelFactory.getInstance(activity.application)
-        return ViewModelProvider(activity, factory).get(DetailViewModel::class.java)
+        return ViewModelProvider(activity, factory)[DetailViewModel::class.java]
     }
 
-    private fun insertToDatabase(detailList: DetailUserResponse) {
-        favoriteUser.let { favoriteUser ->
-            favoriteUser?.id = detailList.id!!
-            favoriteUser?.login = detailList.login
-            favoriteUser?.htmlUrl = detailList.htmlUrl
-            favoriteUser?.avatarUrl = detailList.avatarUrl
-            viewModel.insert(favoriteUser as FavoriteUser)
+    private fun insertFavoriteUser(login: String, avatarUrl: String, htmlUrl: String) {
+        viewModel.isFavorited(login).observe(this) { favoriteUser ->
+            isFavorited = favoriteUser != null
+
+            if (isFavorited) {
+                favButton.setImageResource(R.drawable.ic_favorite_fill)
+            } else {
+                favButton.setImageResource(R.drawable.ic_favorite)
+            }
+
+            favButton.setOnClickListener {
+                val data = FavoriteUser(login = login, avatarUrl = avatarUrl, htmlUrl = htmlUrl)
+
+                if (!isFavorited) {
+                    viewModel.insert(data)
+                    isFavorited = true
+                    favButton.setImageResource(R.drawable.ic_favorite_fill)
+                }
+                else {
+                    viewModel.delete(data)
+                    isFavorited = false
+                    favButton.setImageResource(R.drawable.ic_favorite)
+                }
+            }
         }
+
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 
     private fun showLoading(isLoading: Boolean) {
-        if (isLoading){
-            progressBar.visibility =  View.VISIBLE
+        if (isLoading) {
+            progressBar.visibility = View.VISIBLE
         } else {
             progressBar.visibility = View.GONE
         }

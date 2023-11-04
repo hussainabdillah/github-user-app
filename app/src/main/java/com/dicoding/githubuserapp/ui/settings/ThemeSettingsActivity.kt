@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.githubuserapp.R
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -12,6 +13,11 @@ class ThemeSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_theme_settings)
+
+        val toolbar = findViewById<Toolbar>(R.id.my_toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        getSupportActionBar()?.setTitle("Settings");
 
         val switchTheme = findViewById<SwitchMaterial>(R.id.switch_theme)
 
@@ -32,6 +38,10 @@ class ThemeSettingsActivity : AppCompatActivity() {
         switchTheme.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             mainViewModel.saveThemeSettings(isChecked)
         }
+    }
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 
 }

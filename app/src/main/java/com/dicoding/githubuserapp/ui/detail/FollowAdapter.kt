@@ -1,4 +1,4 @@
-package com.dicoding.githubuserapp.ui
+package com.dicoding.githubuserapp.ui.detail
 
 import android.view.LayoutInflater
 import android.view.View
@@ -34,7 +34,7 @@ class FollowAdapter : ListAdapter<ItemsItem, FollowAdapter.MyViewHolder>(DIFF_CA
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FollowAdapter.MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_user, parent, false)
         return MyViewHolder(itemView)
     }

@@ -9,13 +9,9 @@ import kotlinx.android.parcel.Parcelize
 @Entity
 @Parcelize
 class FavoriteUser(
-    @PrimaryKey(autoGenerate = true)
-
-    @ColumnInfo(name = "id")
-    var id: Int = 0,
-
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "login")
-    var login: String? = null,
+    var login: String,
 
     @ColumnInfo(name = "avatar_url")
     var avatarUrl: String? = null,

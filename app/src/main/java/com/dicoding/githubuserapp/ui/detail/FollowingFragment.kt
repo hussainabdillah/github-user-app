@@ -1,4 +1,4 @@
-package com.dicoding.githubuserapp.ui
+package com.dicoding.githubuserapp.ui.detail
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.githubuserapp.data.response.ItemsItem
 import com.dicoding.githubuserapp.data.retrofit.ApiConfig
-import com.dicoding.githubuserapp.databinding.FragmentFollowersBinding
+import com.dicoding.githubuserapp.databinding.FragmentFollowingBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class FollowersFragment : Fragment() {
-    private lateinit var binding: FragmentFollowersBinding
+class FollowingFragment : Fragment() {
+    private lateinit var binding: FragmentFollowingBinding
     private lateinit var adapter: FollowAdapter
     private var username: String? = null
     companion object {
@@ -27,7 +27,7 @@ class FollowersFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentFollowersBinding.inflate(inflater, container, false)
+        binding = FragmentFollowingBinding.inflate(inflater, container, false)
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,13 +49,13 @@ class FollowersFragment : Fragment() {
         arguments?.let {
             username = it.getString(ARG_USERNAME)
         }
-        username?.let { fetchFollowers(it) }
+        username?.let { fetchFollowing(it) }
 
     }
-    fun fetchFollowers(username: String) {
+    fun fetchFollowing(username: String) {
         showLoading(true)
         ApiConfig.getApiService()
-            .getFollowers(username)
+            .getFollowing(username)
             .enqueue(object : Callback<List<ItemsItem>> {
                 override fun onResponse(call: Call<List<ItemsItem>>, response: Response<List<ItemsItem>>) {
                     showLoading(false)
@@ -65,13 +65,13 @@ class FollowersFragment : Fragment() {
                             adapter.submitList(userResponse)
                         }
                     } else {
-                        Log.d("FetchFollowersError", "Error fetching followers: ${response.message()}")
+                        Log.d("FetchFollowingError", "Error fetching following: ${response.message()}")
                     }
                 }
 
                 override fun onFailure(call: Call<List<ItemsItem>>, t: Throwable) {
                     showLoading(false)
-                    Log.d("FetchFollowersFailure", "Failed to fetch followers: ${t.message}")
+                    Log.d("FetchFollowingFailure", "Failed to fetch following: ${t.message}")
                 }
             })
     }
@@ -83,6 +83,3 @@ class FollowersFragment : Fragment() {
         }
     }
 }
-
-
-

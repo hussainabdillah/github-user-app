@@ -3,6 +3,7 @@ package com.dicoding.githubuserapp.ui
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.dicoding.githubuserapp.ui.detail.DetailViewModel
 import com.dicoding.githubuserapp.ui.favorites.FavoriteUserViewModel
 
 class ViewModelFactory private constructor(private val mApplication: Application) : ViewModelProvider.NewInstanceFactory() {

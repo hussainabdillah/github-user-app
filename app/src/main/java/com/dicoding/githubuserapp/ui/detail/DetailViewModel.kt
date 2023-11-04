@@ -1,4 +1,4 @@
-package com.dicoding.githubuserapp.ui
+package com.dicoding.githubuserapp.ui.detail
 
 import android.app.Application
 import android.util.Log
@@ -29,6 +29,8 @@ class DetailViewModel(application: Application) : ViewModel() {
 
     private val _following = MutableLiveData<List<ItemsItem>>()
     val following: LiveData<List<ItemsItem>> = _following
+
+    fun isFavorited(username: String) : LiveData<FavoriteUser> = mFavoriteUserRepository.isFavorited(username)
 
     private val mFavoriteUserRepository: FavoriteUserRepository = FavoriteUserRepository(application)
     fun setUserDetail(username: String) {
@@ -100,6 +102,9 @@ class DetailViewModel(application: Application) : ViewModel() {
 
     fun insert(favoriteUser: FavoriteUser) {
         mFavoriteUserRepository.insert(favoriteUser)
+        Log.d(TAG, "insert: $favoriteUser")
+        Log.d(TAG, "insert: ${favoriteUser.login}")
+        Log.d(TAG, "insert: ${favoriteUser.avatarUrl}")
     }
 
     fun delete(favoriteUser: FavoriteUser) {
@@ -111,4 +116,8 @@ class DetailViewModel(application: Application) : ViewModel() {
     }
 
     fun getAllFavoriteUser(): LiveData<List<FavoriteUser>> = mFavoriteUserRepository.getAllFavoriteUser()
+
+    companion object {
+        private const val TAG = "DetailViewModel"
+    }
 }

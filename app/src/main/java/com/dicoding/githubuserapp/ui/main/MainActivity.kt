@@ -1,4 +1,4 @@
-package com.dicoding.githubuserapp.ui
+package com.dicoding.githubuserapp.ui.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.githubuserapp.R
@@ -13,8 +14,14 @@ import com.dicoding.githubuserapp.data.response.GithubResponse
 import com.dicoding.githubuserapp.data.response.ItemsItem
 import com.dicoding.githubuserapp.data.retrofit.ApiConfig
 import com.dicoding.githubuserapp.databinding.ActivityMainBinding
+import com.dicoding.githubuserapp.ui.detail.DetailActivity
+import com.dicoding.githubuserapp.ui.UserAdapter
 import com.dicoding.githubuserapp.ui.favorites.FavoriteUserActivity
+import com.dicoding.githubuserapp.ui.settings.SettingsPreferences
+import com.dicoding.githubuserapp.ui.settings.SettingsViewModelFactory
 import com.dicoding.githubuserapp.ui.settings.ThemeSettingsActivity
+import com.dicoding.githubuserapp.ui.settings.ThemeSettingsViewModel
+import com.dicoding.githubuserapp.ui.settings.dataStore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,7 +44,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        val pref = SettingsPreferences.getInstance(dataStore)
+        viewModel = ViewModelProvider(this, SettingsViewModelFactory(pref)).get(MainViewModel::class.java)
 
         with(binding) {
             searchView.setupWithSearchBar(searchBar)
@@ -53,7 +61,6 @@ class MainActivity : AppCompatActivity() {
             searchBar.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.theme_setting -> {
-                        // Handle klik pada menu theme_setting di sini
                         val intent = Intent(this@MainActivity, ThemeSettingsActivity::class.java)
                         startActivity(intent)
                         true
@@ -79,6 +86,7 @@ class MainActivity : AppCompatActivity() {
             override fun onItemClick(user: ItemsItem) {
                 val intent = Intent(this@MainActivity, DetailActivity::class.java)
                 intent.putExtra("username", user.login)
+                intent.putExtra("htmlUrl", user.htmlUrl)
                 startActivity(intent)
             }
         })
@@ -89,11 +97,18 @@ class MainActivity : AppCompatActivity() {
             showLoading(isLoading)
         }
         showUserGitHub()
+
+        viewModel.getThemeSettings().observe(this) { isDarkModeActive: Boolean ->
+            if (isDarkModeActive) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.theme_setting -> {
-                // Handle klik pada menu theme_setting di sini
                 val intent = Intent(this, ThemeSettingsActivity::class.java)
                 startActivity(intent)
                 return true
